@@ -50,3 +50,6 @@ window.RegExp("foo");
 window.RegExp("foo", "gi");
 new window.RegExp("foo");
 new window.RegExp("foo", "gi");
+
+// Trivia preservation in constructor flags
+new RegExp("foo", /* leading */ "gi" /* trailing */);

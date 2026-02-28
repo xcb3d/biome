@@ -1,6 +1,5 @@
 ---
 source: crates/biome_js_analyze/tests/spec_tests.rs
-assertion_line: 152
 expression: invalid.js
 ---
 # Input
@@ -57,6 +56,9 @@ window.RegExp("foo");
 window.RegExp("foo", "gi");
 new window.RegExp("foo");
 new window.RegExp("foo", "gi");
+
+// Trivia preservation in constructor flags
+new RegExp("foo", /* leading */ "gi" /* trailing */);
 
 ```
 
@@ -856,6 +858,7 @@ invalid.js:52:1 lint/nursery/useUnicodeRegex  FIXABLE  ━━━━━━━━�
   > 52 │ new window.RegExp("foo", "gi");
        │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
     53 │ 
+    54 │ // Trivia preservation in constructor flags
   
   i The u flag enables Unicode mode which correctly handles Unicode characters. The v flag (ES2024) enables Unicode Sets mode with additional features.
   
@@ -868,6 +871,32 @@ invalid.js:52:1 lint/nursery/useUnicodeRegex  FIXABLE  ━━━━━━━━�
     52    │ - new·window.RegExp("foo",·"gi");
        52 │ + new·window.RegExp("foo",·"giu");
     53 53 │   
+    54 54 │   // Trivia preservation in constructor flags
+  
+
+```
+
+```
+invalid.js:55:1 lint/nursery/useUnicodeRegex  FIXABLE  ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+  i Use the u or v flag for this regular expression.
+  
+    54 │ // Trivia preservation in constructor flags
+  > 55 │ new RegExp("foo", /* leading */ "gi" /* trailing */);
+       │ ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+    56 │ 
+  
+  i The u flag enables Unicode mode which correctly handles Unicode characters. The v flag (ES2024) enables Unicode Sets mode with additional features.
+  
+  i This rule belongs to the nursery group, which means it is not yet stable and may change in the future. Visit https://biomejs.dev/linter/#nursery for more information.
+  
+  i Safe fix: Add the u flag.
+  
+    53 53 │   
+    54 54 │   // Trivia preservation in constructor flags
+    55    │ - new·RegExp("foo",·/*·leading·*/·"gi"·/*·trailing·*/);
+       55 │ + new·RegExp("foo",·/*·leading·*/·"giu"·/*·trailing·*/);
+    56 56 │   
   
 
 ```

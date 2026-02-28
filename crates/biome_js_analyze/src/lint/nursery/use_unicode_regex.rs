@@ -175,11 +175,26 @@ impl Rule for UseUnicodeRegex {
                     let static_val = flags_expr.as_static_value()?;
                     let flags_text = static_val.as_string_constant()?;
                     let new_flags = format!("{}{}u{}", quote_char, flags_text, quote_char);
+
+                    let mut text = String::new();
+                    let mut leading = vec![];
+                    let mut trailing = vec![];
+
+                    for t in token.leading_trivia().pieces() {
+                        text.push_str(t.text());
+                        leading.push(TriviaPiece::new(t.kind(), t.text_len()));
+                    }
+                    text.push_str(&new_flags);
+                    for t in token.trailing_trivia().pieces() {
+                        text.push_str(t.text());
+                        trailing.push(TriviaPiece::new(t.kind(), t.text_len()));
+                    }
+
                     let new_token = JsSyntaxToken::new_detached(
                         JsSyntaxKind::JS_STRING_LITERAL,
-                        &new_flags,
-                        [],
-                        [],
+                        &text,
+                        leading,
+                        trailing,
                     );
                     mutation.replace_token(token, new_token);
                 }
